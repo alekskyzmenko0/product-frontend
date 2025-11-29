@@ -48,11 +48,11 @@ export default function ProductPage() {
       <h1 className="text-3xl font-bold">{product.title}</h1>
       <p>{product.description}</p>
 
-      <img
-        src={product.imageUrl}
-        alt={product.title}
-        className="w-80 rounded shadow"
-      />
+<img
+  src={`${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/uploads/${product.imageUrl.split("/").pop()}`}
+  alt={product.title}
+  className="w-80 rounded shadow"
+/>
 
       <ModelViewer src={product.modelUrl} alt="3D модель товара" />
     </main>
