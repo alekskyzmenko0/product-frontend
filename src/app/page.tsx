@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import Link from "next/link"; 
+import ProductCard from "@/components/ProductCard";
+import Navbar from "@/components/Navbar";
 
 interface Product {
   _id: string;
@@ -11,58 +12,32 @@ interface Product {
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadProducts() {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
-          cache: "no-store",
-        });
-
-        if (!res.ok) {
-          throw new Error("Ошибка загрузки списка товаров");
-        }
-
-        const data = await res.json();
-        setProducts(data);
-      } catch (err) {
-        console.error("API Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadProducts();
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`)
+      .then(res => res.json())
+      .then(data => setProducts(data))
+      .catch(err => console.error("API Error:", err));
   }, []);
 
-  if (loading) return <p className="p-6">Загрузка...</p>;
-
   return (
-    <main className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Список товаров</h1>
+    <main className="min-h-screen bg-black px-10">
+      <Navbar />
 
-      {products.length === 0 ? (
-        <p>Нет товаров</p>
-      ) : (
-        <div className="grid grid-cols-3 gap-6">
-{products.map(product => (
-  <Link
-    key={product._id}
-    href={`/product/${product._id}`}
-    className="border p-4 rounded shadow block hover:bg-gray-100 transition"
-  >
-<img
-  src={`${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/uploads/${product.imageUrl.split("/").pop()}`}
-  alt={product.title}
-  className="w-full h-40 object-cover rounded mb-2"
-/>
+      <h1 className="text-4xl font-bold text-white mb-10 text-center">
+        Выбери свой Mac
+      </h1>
 
-    <h2 className="text-lg font-semibold">{product.title}</h2>
-  </Link>
-))}
-        </div>
-      )}
+      <div className="grid grid-cols-3 gap-10 max-w-7xl mx-auto">
+        {products.map(product => (
+          <ProductCard
+            key={product._id}
+            id={product._id}
+            title={product.title}
+            imageUrl={product.imageUrl}
+          />
+        ))}
+      </div>
     </main>
   );
 }
