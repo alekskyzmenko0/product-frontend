@@ -52,11 +52,12 @@ export default function Home() {
     href={`/product/${product._id}`}
     className="border p-4 rounded shadow block hover:bg-gray-100 transition"
   >
-    <img
-      src={product.imageUrl}
-      alt={product.title}
-      className="w-full h-40 object-cover rounded mb-2"
-    />
+<img
+  src={`${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/uploads/${product.imageUrl.split("/").pop()}`}
+  alt={product.title}
+  className="w-full h-40 object-cover rounded mb-2"
+/>
+
     <h2 className="text-lg font-semibold">{product.title}</h2>
   </Link>
 ))}
