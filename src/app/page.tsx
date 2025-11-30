@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import Link from "next/link"; 
+import { motion } from "framer-motion";
+import ProductCard from "@/components/ProductCard";
 
 interface Product {
   _id: string;
@@ -20,9 +21,7 @@ export default function Home() {
           cache: "no-store",
         });
 
-        if (!res.ok) {
-          throw new Error("Ошибка загрузки списка товаров");
-        }
+        if (!res.ok) throw new Error("Ошибка загрузки списка товаров");
 
         const data = await res.json();
         setProducts(data);
@@ -36,33 +35,64 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  if (loading) return <p className="p-6">Загрузка...</p>;
+  if (loading)
+    return <p className="text-white text-center pt-20 text-xl">Загрузка...</p>;
 
   return (
-    <main className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Список товаров</h1>
+    <main className="min-h-screen bg-black pt-20 px-10 text-white">
+      
+            {/* 🔥 TOGGLE MENU — пока не кликабельный */}
+      <div
+        className="
+          absolute top-8 right-10
+          w-10 h-10 p-2 rounded-xl
+          flex flex-col justify-between
+          border border-white/10
+          bg-white/5 backdrop-blur-xl
+          hover:border-white/20 hover:scale-105
+          transition-all duration-300 cursor-pointer
+        "
+      >
+        <span className="block w-full h-[3px] bg-white rounded"></span>
+        <span className="block w-full h-[3px] bg-white rounded"></span>
+        <span className="block w-full h-[3px] bg-white rounded"></span>
+      </div>
+      
+      <motion.h1
+        className="text-5xl font-semibold text-center mb-16 tracking-tight"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        Выбери свой Mac
+      </motion.h1>
 
-      {products.length === 0 ? (
-        <p>Нет товаров</p>
-      ) : (
-        <div className="grid grid-cols-3 gap-6">
-{products.map(product => (
-  <Link
-    key={product._id}
-    href={`/product/${product._id}`}
-    className="border p-4 rounded shadow block hover:bg-gray-100 transition"
-  >
-<img
-  src={`${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/uploads/${product.imageUrl.split("/").pop()}`}
-  alt={product.title}
-  className="w-full h-40 object-cover rounded mb-2"
-/>
-
-    <h2 className="text-lg font-semibold">{product.title}</h2>
-  </Link>
-))}
-        </div>
-      )}
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 max-w-7xl mx-auto"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          visible: { transition: { staggerChildren: 0.15 } },
+        }}
+      >
+        {products.map(product => (
+          <motion.div
+            key={product._id}
+            variants={{
+              hidden: { opacity: 0, scale: 0.95, y: 10 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+            }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="flex justify-center"
+          >
+            <ProductCard
+              id={product._id}
+              title={product.title}
+              imageUrl={product.imageUrl}
+            />
+          </motion.div>
+        ))}
+      </motion.div>
     </main>
   );
 }
